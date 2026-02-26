@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAEDIE NEXUS | Global Defense & Tech</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Syncopate:wght@700&family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap');
+
+        :root {
+            --nexus-blue: #0062ff;
+            --nexus-dark: #020617;
+            --accent-cyan: #00f2ff;
+            --glass: rgba(15, 23, 42, 0.95);
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { margin: 0; background: var(--nexus-dark); color: #f8fafc; font-family: 'Plus Jakarta Sans', sans-serif; overflow-x: hidden; }
+
+        /* --- 1. BOOT LOADER --- */
+        #loader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--nexus-dark); display: flex; flex-direction: column;
+            justify-content: center; align-items: center; z-index: 9999;
+        }
+        .bar-container { width: 150px; height: 2px; background: rgba(255,255,255,0.05); margin-top: 20px; }
+        .bar-progress { height: 100%; background: var(--nexus-blue); width: 0; animation: load 2s forwards; }
+        @keyframes load { to { width: 100%; } }
+
+        /* --- 2. LANDING SCREEN (EXTENDED BIO) --- */
+        #vault-screen {
+            display: none; min-height: 100vh; width: 100%; flex-direction: column;
+            justify-content: center; align-items: center; text-align: center; padding: 60px 20px;
+            background: radial-gradient(circle at center, rgba(0,98,255,0.07) 0%, transparent 80%);
+        }
+        .bio-container { max-width: 800px; margin-bottom: 50px; animation: fadeIn 2.5s ease; }
+        .bio-text { color: #94a3b8; line-height: 2; font-size: 1rem; text-align: justify; letter-spacing: 0.5px; }
+        .bio-text b { color: var(--nexus-blue); }
+
+        /* THE ANIMATED START BUTTON */
+        .enter-btn {
+            position: relative; padding: 25px 80px; border: 1px solid var(--nexus-blue); 
+            background: transparent; color: white; font-family: 'Syncopate', sans-serif; 
+            font-size: 0.9rem; letter-spacing: 8px; cursor: pointer; border-radius: 5px; 
+            transition: 0.5s; overflow: hidden;
+        }
+        .enter-btn:hover {
+            color: var(--nexus-dark); background: var(--nexus-blue);
+            box-shadow: 0 0 50px var(--nexus-blue);
+        }
+        .enter-btn::before {
+            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: 0.5s;
+        }
+        .enter-btn:hover::before { left: 100%; }
+
+        /* BUTTON PULSE ANIMATION */
+        .pulse { animation: pulse-blue 2s infinite; }
+        @keyframes pulse-blue {
+            0% { box-shadow: 0 0 0 0 rgba(0, 98, 255, 0.7); }
+            70% { box-shadow: 0 0 0 20px rgba(0, 98, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 98, 255, 0); }
+        }
+
+        /* --- 3. SECTOR SELECTION --- */
+        #sector-screen {
+            display: none; height: 100vh; width: 100%; flex-direction: column;
+            justify-content: center; align-items: center; text-align: center; padding: 20px;
+        }
+        .sector-grid { display: grid; grid-template-columns: 1fr; gap: 20px; width: 100%; max-width: 450px; }
+        .sector-card {
+            background: rgba(15, 23, 42, 0.5); border: 1px solid #1e293b;
+            padding: 35px; border-radius: 4px; cursor: pointer; transition: 0.4s;
+            position: relative; overflow: hidden;
+        }
+        .sector-card:hover { border-color: var(--accent-cyan); background: rgba(0, 98, 255, 0.05); transform: translateY(-5px); }
+        .sector-card h2 { font-family: 'Syncopate', sans-serif; font-size: 0.75rem; color: var(--accent-cyan); margin: 0; }
+
+        /* --- 4. MAIN SITE --- */
+        #main-site { display: none; height: 100vh; overflow-y: auto; }
+        nav { 
+            position: sticky; top: 0; background: var(--nexus-dark); z-index: 100;
+            padding: 25px; display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.05); 
+        }
+        .logo { font-family: 'Syncopate', sans-serif; font-size: 1.1rem; letter-spacing: 5px; }
+        .logo span { color: var(--nexus-blue); }
+
+        .container { padding: 30px 20px; max-width: 900px; margin: 0 auto; }
+        .card { background: var(--glass); padding: 35px; border-radius: 5px; border-left: 4px solid var(--nexus-blue); border-top: 1px solid #1e293b; border-right: 1px solid #1e293b; border-bottom: 1px solid #1e293b; margin-bottom: 30px; }
+        .price { font-size: 2rem; font-weight: 800; display: block; margin: 20px 0; color: #fff; letter-spacing: -1px; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* TRANSITION EFFECT */
+        .glitch-out { animation: glitch 0.3s forwards; }
+        @keyframes glitch {
+            0% { transform: translate(0); filter: hue-rotate(0deg); }
+            50% { transform: translate(-10px, 5px); filter: hue-rotate(90deg); }
+            100% { opacity: 0; }
+        }
+    </style>
+</head>
+<body onload="bootSystem()">
+
+    <div id="loader">
+        <div style="font-family: 'Syncopate', sans-serif; font-size: 0.6rem; color: var(--accent-cyan); letter-spacing: 5px;">SYNCING GLOBAL ASSETS...</div>
+        <div class="bar-container"><div class="bar-progress"></div></div>
+    </div>
+
+    <div id="vault-screen">
+        <h1 style="font-family: 'Syncopate', sans-serif; font-size: 2.5rem; margin-bottom: 30px; letter-spacing: 15px;">MAEDIE NEXUS</h1>
+        
+        <div class="bio-container">
+            <h2 style="font-size: 0.75rem; color: var(--accent-cyan); letter-spacing: 5px; margin-bottom: 25px;">CORPORATE OVERVIEW</h2>
+            <div class="bio-text">
+                <b>Maedie Nexus</b> stands as a global titan in the industry of <b>High-Tier Technology and Defense Systems</b>. Our legacy is built upon an unwavering commitment to <b>Loyal Service</b> and groundbreaking innovation. We don't just adapt to the future; we architect it through military-grade precision and elite engineering. <br><br>
+                Under the strategic leadership of <b>Laddie Earl Candal</b>, Maedie Nexus has pioneered the most secure <b>Global Infrastructure</b> ever recorded. From autonomous <b>Neural-AI Developments</b> to high-fidelity <b>Quantum Simulation Engines</b>, our portfolio serves the world's most demanding enterprises. Every unit acquired from our portal is a testament to our dominance in the digital frontier. Welcome to the Nexus—where technology meets absolute loyalty.
+            </div>
+        </div>
+
+        <button class="enter-btn pulse" id="startBtn" onclick="maangasTransition()">INITIALIZE ACCESS</button>
+        <p style="margin-top: 40px; font-size: 0.65rem; color: #475569; letter-spacing: 3px;">ESTABLISHED 2026 | ALL RIGHTS RESERVED</p>
+    </div>
+
+    <div id="sector-screen">
+        <h2 style="font-family: 'Syncopate', sans-serif; font-size: 0.9rem; margin-bottom: 40px; letter-spacing: 6px;">SELECT OPERATIONS SECTOR</h2>
+        <div class="sector-grid">
+            <div class="sector-card" onclick="openSystem('Infrastructure')">
+                <h2>INFRASTRUCTURE & SECURITY</h2>
+                <p style="font-size: 0.6rem; color: #475569; margin-top: 10px;">Hardware, Servers, & Firewalls</p>
+            </div>
+            <div class="sector-card" onclick="openSystem('Development')">
+                <h2>DEVELOPMENT & AI</h2>
+                <p style="font-size: 0.6rem; color: #475569; margin-top: 10px;">Programming Suites & Neural Cores</p>
+            </div>
+            <div class="sector-card" onclick="openSystem('Gaming')">
+                <h2>VIRTUAL SIMULATION</h2>
+                <p style="font-size: 0.6rem; color: #475569; margin-top: 10px;">Quantum Game Engines & VR</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="main-site">
+        <nav>
+            <div class="logo">MAEDIE<span>NEXUS</span></div>
+            <button onclick="backToSectors()" style="background:transparent; color:var(--accent-cyan); border:1px solid rgba(0,242,255,0.3); padding:8px 15px; font-size:0.6rem; cursor:pointer; letter-spacing:2px; border-radius:3px;">TERMINATE SESSION</button>
+        </nav>
+        
+        <div class="container" id="product-list">
+            </div>
+    </div>
+
+    <div id="orderModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.98); z-index:10000; justify-content:center; align-items:center; padding:20px;">
+        <div style="background:#0f172a; padding:40px; border-radius:5px; width:100%; max-width:450px; border:1px solid var(--nexus-blue);">
+            <h2 style="font-family:'Syncopate'; font-size:0.75rem; color:var(--accent-cyan); text-align:center; margin-bottom:30px; letter-spacing:3px;">TRANSACTION AUTHENTICATION</h2>
+            <input type="text" id="custName" placeholder="Full Legal Name" style="width:100%; padding:15px; margin-bottom:15px; background:#020617; border:1px solid #1e293b; color:white; outline:none;">
+            <input type="text" id="custPhone" placeholder="Contact Designation (Phone)" style="width:100%; padding:15px; margin-bottom:15px; background:#020617; border:1px solid #1e293b; color:white;">
+            <input type="text" id="custCountry" placeholder="Operational Country" style="width:100%; padding:15px; margin-bottom:15px; background:#020617; border:1px solid #1e293b; color:white;">
+            <input type="text" id="custAddress" placeholder="Precise Delivery Coordinates" style="width:100%; padding:15px; margin-bottom:25px; background:#020617; border:1px solid #1e293b; color:white;">
+            <button onclick="triggerConfettiOrder()" style="width:100%; padding:20px; background:var(--nexus-blue); color:white; border:none; font-weight:800; cursor:pointer; letter-spacing:2px;">CONFIRM ACQUISITION</button>
+            <button onclick="document.getElementById('orderModal').style.display='none'" style="width:100%; padding:15px; background:transparent; color:#475569; border:none; margin-top:10px; cursor:pointer; font-size:0.7rem;">ABORT TRANSACTION</button>
+        </div>
+    </div>
+
+    <script>
+        const MY_EMAIL = "technologyladdie@gmail.com";
+        const inventory = {
+            "Infrastructure": [
+                { name: "Nexus Sovereign Rack", price: "₱2,500,000", desc: "Tier-4 Enterprise Server Array with Cold Fusion Cooling." },
+                { name: "Titan Aegis Firewall", price: "₱1,250,000", desc: "Military-Grade Network Protection against Quantum Attacks." },
+                { name: "Orbital Link Satellite", price: "₱155,000,000", desc: "Private Deep-Space Encrypted Communication Uplink." },
+                { name: "Bio-Metric Security Gate", price: "₱3,800,000", desc: "Retinal and DNA scanning hardware for high-value vaults." }
+            ],
+            "Development": [
+                { name: "Neural Logic AI Suite", price: "₱65,000,000", desc: "Autonomous Coding Intelligence for Global Infrastructure." },
+                { name: "Nexus Quantum DB", price: "₱22,000,000", desc: "Infinite Relational Database with Instant Sync Technology." },
+                { name: "Cyber-Defense Toolkit", price: "₱9,500,000", desc: "All-in-one offensive and defensive security environment." },
+                { name: "Custom Kernel Builder", price: "₱14,200,000", desc: "Software for building private, unhackable operating systems." }
+            ],
+            "Gaming": [
+                { name: "Nexus Reality Engine 9", price: "₱450,000,000", desc: "The world's most advanced engine for Metaverse and Reality Simulation." },
+                { name: "Full-Immersant Station", price: "₱8,500,000", desc: "Haptic sensory unit for total neurological gaming immersion." },
+                { name: "Quantum Rendering Node", price: "₱35,000,000", desc: "Renders photorealistic 16K environments in real-time." }
+            ]
+        };
+
+        function bootSystem() {
+            setTimeout(() => {
+                document.getElementById('loader').style.display = 'none';
+                document.getElementById('vault-screen').style.display = 'flex';
+                document.body.style.overflow = 'auto'; 
+            }, 2500);
+        }
+
+        function maangasTransition() {
+            const btn = document.getElementById('startBtn');
+            btn.classList.add('glitch-out');
+            setTimeout(() => {
+                document.getElementById('vault-screen').style.display = 'none';
+                document.getElementById('sector-screen').style.display = 'flex';
+                window.scrollTo(0,0);
+            }, 300);
+        }
+
+        function openSystem(sector) {
+            document.getElementById('sector-screen').style.display = 'none';
+            document.getElementById('main-site').style.display = 'block';
+            const list = document.getElementById('product-list');
+            list.innerHTML = `<h1 style="text-align:center; font-family:'Syncopate'; font-size:1.1rem; margin:60px 0; letter-spacing:8px; color:var(--nexus-blue);">${sector} OPERATIONS</h1>`;
+            
+            inventory[sector].forEach(item => {
+                list.innerHTML += `
+                    <div class="card" style="animation: fadeIn 0.8s;">
+                        <h3 style="font-family:'Syncopate'; font-size:0.8rem; color:var(--accent-cyan);">${item.name}</h3>
+                        <p style="color:#94a3b8; font-size:0.9rem; margin-top:15px; line-height:1.6;">${item.desc}</p>
+                        <span class="price">${item.price}</span>
+                        <button onclick="openModal('${item.name}', '${item.price}')" style="width:100%; padding:20px; background:var(--nexus-blue); color:white; border:none; font-weight:800; cursor:pointer; letter-spacing:2px; border-radius:3px;">ACQUIRE ASSET</button>
+                    </div>
+                `;
+            });
+        }
+
+        function backToSectors() {
+            document.getElementById('main-site').style.display = 'none';
+            document.getElementById('sector-screen').style.display = 'flex';
+        }
+
+        function openModal(p, pr) {
+            selectedProduct = p; selectedPrice = pr;
+            document.getElementById('orderModal').style.display = 'flex';
+        }
+
+        function triggerConfettiOrder() {
+            const name = document.getElementById('custName').value;
+            if(!name) return alert("Incomplete Data: Full Legal Name required.");
+            confetti({ particleCount: 350, spread: 180, origin: { y: 0.6 } });
+            setTimeout(() => {
+                const subject = encodeURIComponent(`ASSET ACQUISITION: ${selectedProduct}`);
+                const body = encodeURIComponent(`Inquiry for Asset: ${selectedProduct}\nMarket Valuation: ${selectedPrice}\nAuthorized Personnel: ${name}\nLocation: ${document.getElementById('custAddress').value}\nOperational Country: ${document.getElementById('custCountry').value}`);
+                window.location.href = `mailto:${MY_EMAIL}?subject=${subject}&body=${body}`;
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
